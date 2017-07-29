@@ -20,6 +20,7 @@ public class GridManager : Singleton<GridManager> {
 	// Use this for initialization
 	void Start () {
 		GenerateGrid ();
+		GameManager.Instance.OnGridGenerated ();
 	}
 	
 	// Update is called once per frame
@@ -42,7 +43,5 @@ public class GridManager : Singleton<GridManager> {
 				}
 			}
 		}
-
-		GameManager.Instance.OnGridGenerated ();
 	}
 }
