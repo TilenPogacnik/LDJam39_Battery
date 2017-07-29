@@ -8,6 +8,7 @@ public class GameManager : Singleton<GameManager> {
 	[SerializeField] private float SpawnYOffset;
 
 	public float BlockTimeLimit;
+	public float MinBlockTouchDuration;
 	// Use this for initialization
 	void Start () {
 		

@@ -6,10 +6,12 @@ using UnityEngine;
 public class BlockController : MonoBehaviour {
 
 	[SerializeField] private float CurrentHealth;
-	[SerializeField] private SpriteRenderer BlockSprite;
+	[SerializeField] private SpriteRenderer BlockSprite = null;
+	[SerializeField] private Rigidbody2D Rigidbody = null;
+
 	private bool isTouchingPlayer = false;
 	private bool isFalling = false;
-
+	private float CurrentTouchDuration = float.MaxValue;
 	private float DeathYPosition;
 
 	void Awake () {
@@ -17,25 +19,25 @@ public class BlockController : MonoBehaviour {
 		DeathYPosition = this.transform.localPosition.y + this.transform.localScale.y/2;
 	}
 	
-	void Update () {
-		if (isTouchingPlayer) {
+	void FixedUpdate () {
+		if (isTouchingPlayer || CurrentTouchDuration < GameManager.Instance.MinBlockTouchDuration) {
 			DecreaseBlockHealth ();
 		}
 	}
 
 	private void DecreaseBlockHealth(){
-		CurrentHealth -= Time.deltaTime / GameManager.Instance.BlockTimeLimit;
+		CurrentHealth -= Time.fixedDeltaTime / GameManager.Instance.BlockTimeLimit;
 		UpdateBlockColor ();
-		//UpdateBlockPosition ();
+		UpdateBlockPosition ();
 		if (CurrentHealth <= 0.0f) {
 			Die ();
 		}
+
+		CurrentTouchDuration += Time.fixedDeltaTime;
 	}
 
 	private void UpdateBlockPosition(){
-		Vector3 position = this.transform.localPosition;
-		position.y = DeathYPosition + this.transform.localScale.y * CurrentHealth;
-		this.transform.localPosition = position;
+		this.transform.localPosition -= new Vector3(0, this.transform.localScale.y * CurrentHealth * Time.fixedDeltaTime, 0);
 	}
 
 	private void UpdateBlockColor(){
@@ -44,25 +46,38 @@ public class BlockController : MonoBehaviour {
 		BlockSprite.color = newColor;
 	}
 
-	void OnCollisionEnter2D(Collision2D coll){
-		if (coll.gameObject.tag == "Player"){
-			Debug.Log ("Player started touching block");
-			isTouchingPlayer = true;
-		} 
-
-		if (coll.gameObject.tag == "Block") {
-			isFalling = false;
-		}
+	public void SetRigidbodyKinematic(bool kinematic){
+		Rigidbody.isKinematic = kinematic;
 	}
 
-	void OnCollisionExit2D(Collision2D coll){
-		if (coll.gameObject.tag == "Player"){
-			Debug.Log ("Player stopped touching block");
+	void OnCollisionEnter2D(Collision2D coll){
+		if (coll.gameObject.tag == Enums.Tags.Player) {
+			//Debug.LogError ("Player died");
+		}
+
+		if (coll.gameObject.tag == Enums.Tags.Block) {
+			Debug.Log ("Stopped falling");
+			SetRigidbodyKinematic (true);
+			DeathYPosition = this.transform.localPosition.y + this.transform.localScale.y/2;
+			isFalling = false;
+		}
+
+	}
+
+	void OnTriggerEnter2D(Collider2D coll){
+		if (!isFalling && coll.gameObject.tag == Enums.Tags.Player){
+			isTouchingPlayer = true;
+			CurrentTouchDuration = 0.0f;
+		} 
+	}
+
+	void OnTriggerExit2D(Collider2D coll){
+		if (coll.gameObject.tag == Enums.Tags.Player){
 			isTouchingPlayer = false;
 		}
 	}
 
 	private void Die(){
-		Destroy (this.gameObject);
+		GridManager.Instance.RemoveBlock (this);
 	}
 }

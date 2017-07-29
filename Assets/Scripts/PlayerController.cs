@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
-	[SerializeField] private float MaxMoveVelocity;
-	[SerializeField] private float MinJumpVelocity;
-	[SerializeField] private float MaxJumpVelocity;
+	[SerializeField] private float MaxMoveVelocity = 0;
+	[SerializeField] private float MinJumpVelocity = 0;
+	[SerializeField] private float MaxJumpVelocity = 0;
+	[SerializeField] private Transform GroundPosition = null;
+	[SerializeField] private float MaxGroundDistance = 0;
 
 	private bool isGrounded = true;
 	private bool isJumping = false;
@@ -18,13 +20,25 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void FixedUpdate () {
+		CheckIfGrounded ();
 		Move ();
 
-		if(InputManager.Instance.JumpPressed && !isJumping){
+		if(isGrounded && !isJumping && InputManager.Instance.JumpPressed){
 			Jump();
 		}
-		if (!InputManager.Instance.JumpPressed && isJumping) {
+		if (isJumping && !InputManager.Instance.JumpPressed) {
 			StopVariableHeightJump ();
+		}
+	}
+
+	private void CheckIfGrounded(){
+		Debug.DrawRay (GroundPosition.position, Vector2.down * MaxGroundDistance, isGrounded ? Color.green : Color.red, 1.0f);
+		RaycastHit2D hit = Physics2D.Raycast(GroundPosition.position, Vector2.down, MaxGroundDistance);
+		if (hit.transform != null) {
+			isJumping = false;
+			isGrounded = true;
+		} else {
+			isGrounded = false;
 		}
 	}
 
@@ -33,17 +47,13 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void Jump(){
-		Debug.Log ("Jumping");
 		isJumping = true;
 		Rigidbody.velocity = new Vector2 (Rigidbody.velocity.x, MaxJumpVelocity);
 	}
 
 	private void StopVariableHeightJump(){
-		Debug.Log ("Stopping variable height jump");
 		if (Rigidbody.velocity.y > MinJumpVelocity) {
 			Rigidbody.velocity = new Vector2 (Rigidbody.velocity.x, MinJumpVelocity);
 		}
-
-		isJumping = false;
 	}
 }
