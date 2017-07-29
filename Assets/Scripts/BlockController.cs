@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(SpriteRenderer))]
 public class BlockController : MonoBehaviour {
 
 	[SerializeField] private float CurrentHealth;
+	[SerializeField] private SpriteRenderer BlockSprite;
 	private bool isTouchingPlayer = false;
 	private bool isFalling = false;
 
 	void Awake () {
 		CurrentHealth = 1.0f;
-		Debug.Log ("Awaking block");
 	}
 	
 	void FixedUpdate () {
@@ -21,6 +22,9 @@ public class BlockController : MonoBehaviour {
 
 	private void DecreaseBlockHealth(){
 		CurrentHealth -= Time.fixedDeltaTime / GameManager.Instance.BlockTimeLimit;
+		Color newColor = BlockSprite.color;
+		newColor.a = CurrentHealth;
+		BlockSprite.color = newColor;
 		if (CurrentHealth <= 0.0f) {
 			Die ();
 		}
@@ -45,7 +49,6 @@ public class BlockController : MonoBehaviour {
 	}
 
 	private void Die(){
-		Debug.Log ("Killing block");
 		Destroy (this.gameObject);
 	}
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridManager : MonoBehaviour {
+public class GridManager : Singleton<GridManager> {
 
 	[SerializeField] private GameObject BlockPrefab;
 	[SerializeField] private float BlockScale;
@@ -12,16 +12,14 @@ public class GridManager : MonoBehaviour {
 	[Range(0.0f, 1.0f)]
 	[SerializeField] private float StartFillPercentage; //Maybe change to StartBlockCount integer
 
-
 	public List<BlockController> Blocks;
 
 	void Awake() {
-		StartCoroutine (GenerateGrid ());
 	}
 
 	// Use this for initialization
 	void Start () {
-		
+		GenerateGrid ();
 	}
 	
 	// Update is called once per frame
@@ -29,7 +27,7 @@ public class GridManager : MonoBehaviour {
 		
 	}
 
-	private IEnumerator GenerateGrid(){
+	private void GenerateGrid(){
 		int gridSpaces = GridSizeX * GridSizeY;
 		int startBlockCount = Mathf.RoundToInt(gridSpaces * StartFillPercentage);
 
@@ -40,10 +38,11 @@ public class GridManager : MonoBehaviour {
 				block.transform.localPosition = blockPosition;
 				Blocks.Add(block.GetComponent<BlockController>());
 				if (Blocks.Count >= startBlockCount) {
-					yield break;
+					return;
 				}
-				yield return null;
 			}
 		}
+
+		GameManager.Instance.OnGridGenerated ();
 	}
 }
