@@ -4,18 +4,17 @@ using UnityEngine;
 
 public class BlockController : MonoBehaviour {
 
-	private float CurrentHealth;
+	[SerializeField] private float CurrentHealth;
 	private bool isTouchingPlayer = false;
 	private bool isFalling = false;
 
 	void Awake () {
-		CurrentHealth = 1.0f;	
+		CurrentHealth = 1.0f;
+		Debug.Log ("Awaking block");
 	}
 	
 	void FixedUpdate () {
 		if (isTouchingPlayer) {
-			Debug.Log ("TouchingPlayer");
-
 			DecreaseBlockHealth ();
 		}
 	}
@@ -47,5 +46,6 @@ public class BlockController : MonoBehaviour {
 
 	private void Die(){
 		Debug.Log ("Killing block");
+		Destroy (this.gameObject);
 	}
 }
