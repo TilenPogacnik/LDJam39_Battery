@@ -35,7 +35,9 @@ public class PlayerController : MonoBehaviour {
 		Debug.DrawRay (GroundPosition.position, Vector2.down * MaxGroundDistance, isGrounded ? Color.green : Color.red, 1.0f);
 		RaycastHit2D hit = Physics2D.Raycast(GroundPosition.position, Vector2.down, MaxGroundDistance);
 		if (hit.transform != null) {
-			isJumping = false;
+			if (!InputManager.Instance.JumpPressed) {
+				isJumping = false;
+			}
 			isGrounded = true;
 		} else {
 			isGrounded = false;

@@ -9,8 +9,15 @@ public class BlockController : MonoBehaviour {
 	[SerializeField] private SpriteRenderer BlockSprite = null;
 	[SerializeField] private Rigidbody2D Rigidbody = null;
 
+	public int Column;
+	public bool isDamaged {
+		get {
+			return CurrentHealth < 1.0f;
+		}
+	}
+	public bool CanBeDamaged = false;
 	private bool isTouchingPlayer = false;
-	private bool isFalling = false;
+	public bool isFalling = false;
 	private float CurrentTouchDuration = float.MaxValue;
 	private float DeathYPosition;
 
@@ -20,9 +27,11 @@ public class BlockController : MonoBehaviour {
 	}
 	
 	void FixedUpdate () {
-		if (isTouchingPlayer || CurrentTouchDuration < GameManager.Instance.MinBlockTouchDuration) {
+		if (CanBeDamaged && (isTouchingPlayer || CurrentTouchDuration < GameManager.Instance.MinBlockTouchDuration)) {
 			DecreaseBlockHealth ();
 		}
+
+		//BlockSprite.color = CanBeDamaged ? Color.red : Color.white;
 	}
 
 	private void DecreaseBlockHealth(){
@@ -37,7 +46,7 @@ public class BlockController : MonoBehaviour {
 	}
 
 	private void UpdateBlockPosition(){
-		this.transform.localPosition -= new Vector3(0, this.transform.localScale.y * CurrentHealth * Time.fixedDeltaTime, 0);
+		this.transform.localPosition -= new Vector3(0, this.transform.localScale.y * CurrentHealth * Time.fixedDeltaTime / GameManager.Instance.BlockTimeLimit, 0);
 	}
 
 	private void UpdateBlockColor(){
@@ -57,11 +66,19 @@ public class BlockController : MonoBehaviour {
 
 		if (coll.gameObject.tag == Enums.Tags.Block) {
 			Debug.Log ("Stopped falling");
+			BlockController otherBlock = coll.gameObject.GetComponent<BlockController> ();
+			if (otherBlock != null){
+				if (otherBlock.isDamaged) {
+					otherBlock.Die ();
+					return;
+				}
+				GridManager.Instance.RefreshColumnDamages (Column);
+			}
 			SetRigidbodyKinematic (true);
+			transform.localPosition = GridManager.Instance.GetNearestPointOnGrid (transform.localPosition);
 			DeathYPosition = this.transform.localPosition.y + this.transform.localScale.y/2;
 			isFalling = false;
 		}
-
 	}
 
 	void OnTriggerEnter2D(Collider2D coll){
@@ -77,7 +94,7 @@ public class BlockController : MonoBehaviour {
 		}
 	}
 
-	private void Die(){
+	public void Die(){
 		GridManager.Instance.RemoveBlock (this);
 	}
 }

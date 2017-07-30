@@ -25,8 +25,13 @@ public class GameManager : Singleton<GameManager> {
 
 	private void SpawnPlayer(){
 		Debug.Log ("Spawning plyer");
-		Vector3 spawnPosition = GridManager.Instance.Blocks [GridManager.Instance.Blocks.Count - 1].transform.position;
+		Vector3 spawnPosition = new  Vector3 (Random.Range(0, GridManager.Instance.GridWidth), GridManager.Instance.HighestBlockYPosition, 0f);
 		spawnPosition.y += SpawnYOffset;
-		Instantiate<GameObject> (PlayerPrefab, spawnPosition, Quaternion.identity, this.transform);
+		Debug.LogError (spawnPosition);
+
+		GameObject player = Instantiate<GameObject> (PlayerPrefab, Vector3.zero, Quaternion.identity, this.transform);
+		player.transform.localPosition = spawnPosition;
+		Debug.LogError (player.transform.localPosition	);
+
 	}
 }
