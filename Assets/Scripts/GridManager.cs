@@ -77,7 +77,7 @@ public class GridManager : Singleton<GridManager> {
 		block.SetRigidbodyKinematic (initialGeneration);
 		block.Column = gridXPosition;
 		block.CanBeDamaged = true;
-		block.isFalling = !initialGeneration;
+		block.IsFalling = !initialGeneration;
 		Blocks[gridXPosition].Add(block);
 		return block;
 	}
@@ -100,7 +100,7 @@ public class GridManager : Singleton<GridManager> {
 			}
 			for (int i = columnBlocks.Count - 1; i >= 0; i--) {
 				columnBlocks [i].CanBeDamaged = true;
-				if (!columnBlocks [i].isFalling) {
+				if (!columnBlocks [i].IsFalling) {
 					break;
 				}
 			}

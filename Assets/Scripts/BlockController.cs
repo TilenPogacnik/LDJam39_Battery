@@ -17,7 +17,7 @@ public class BlockController : MonoBehaviour {
 	}
 	public bool CanBeDamaged = false;
 	private bool isTouchingPlayer = false;
-	public bool isFalling = false;
+	public bool IsFalling = false;
 	private float CurrentTouchDuration = float.MaxValue;
 	private float DeathYPosition;
 
@@ -30,8 +30,12 @@ public class BlockController : MonoBehaviour {
 		if (CanBeDamaged && (isTouchingPlayer || CurrentTouchDuration < GameManager.Instance.MinBlockTouchDuration)) {
 			DecreaseBlockHealth ();
 		}
+		if (Rigidbody.isKinematic) {
+			Rigidbody.velocity = Vector2.zero;
+		}
 
 		//BlockSprite.color = CanBeDamaged ? Color.red : Color.white;
+		//BlockSprite.color = IsFalling ? Color.green: BlockSprite.color;
 	}
 
 	private void DecreaseBlockHealth(){
@@ -64,25 +68,25 @@ public class BlockController : MonoBehaviour {
 			//Debug.LogError ("Player died");
 		}
 
-		if (coll.gameObject.tag == Enums.Tags.Block) {
+		if (IsFalling && coll.gameObject.tag == Enums.Tags.Block) {
 			Debug.Log ("Stopped falling");
 			BlockController otherBlock = coll.gameObject.GetComponent<BlockController> ();
 			if (otherBlock != null){
-				if (otherBlock.isDamaged) {
+				if (otherBlock.Column == this.Column && otherBlock.isDamaged) {
 					otherBlock.Die ();
 					return;
 				}
-				GridManager.Instance.RefreshColumnDamages (Column);
 			}
 			SetRigidbodyKinematic (true);
 			transform.localPosition = GridManager.Instance.GetNearestPointOnGrid (transform.localPosition);
 			DeathYPosition = this.transform.localPosition.y + this.transform.localScale.y/2;
-			isFalling = false;
+			IsFalling = false;
+			GridManager.Instance.RefreshColumnDamages (Column);
 		}
 	}
 
 	void OnTriggerEnter2D(Collider2D coll){
-		if (!isFalling && coll.gameObject.tag == Enums.Tags.Player){
+		if (!IsFalling && coll.gameObject.tag == Enums.Tags.Player){
 			isTouchingPlayer = true;
 			CurrentTouchDuration = 0.0f;
 		} 
