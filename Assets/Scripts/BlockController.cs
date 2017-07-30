@@ -104,6 +104,7 @@ public class BlockController : MonoBehaviour {
 
 	public void Die(){
 		GameManager.Instance.UpdateBlockTimeLimit ();
+		GameManager.Instance.IncreaseScore ();
 		GridManager.Instance.RemoveBlock (this);
 	}
 }

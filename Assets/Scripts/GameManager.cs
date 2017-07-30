@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : Singleton<GameManager> {
 	
@@ -12,7 +13,9 @@ public class GameManager : Singleton<GameManager> {
 	[SerializeField] private float StartBlockTimeLimit;
 	[SerializeField] private float EndBlockTimeLimit;
 	[SerializeField] private int BlocksBeforeEndTimeLimit;
+	[SerializeField] private Text ScoreText;
 
+	private int Score = 0;
 	private int DestroyedBlocksCount = 0;
 
 	[HideInInspector] public float BlockTimeLimit;
@@ -25,6 +28,11 @@ public class GameManager : Singleton<GameManager> {
 	
 	// Update is called once per frame
 	void Update () {
+	}
+
+	public void IncreaseScore(){
+		Score++;
+		ScoreText.text = Score.ToString (); 
 	}
 
 	public void UpdateBlockTimeLimit(){
