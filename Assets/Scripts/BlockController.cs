@@ -27,7 +27,7 @@ public class BlockController : MonoBehaviour {
 	}
 	
 	void FixedUpdate () {
-		if (CanBeDamaged && (isTouchingPlayer || CurrentTouchDuration < GameManager.Instance.MinBlockTouchDuration)) {
+		if (CanBeDamaged && (isTouchingPlayer || CurrentTouchDuration < GameManager.Instance.GetMinBlockTouchDuration())) {
 			DecreaseBlockHealth ();
 		}
 		if (Rigidbody.isKinematic) {
@@ -69,7 +69,6 @@ public class BlockController : MonoBehaviour {
 		}
 
 		if (IsFalling && coll.gameObject.tag == Enums.Tags.Block) {
-			Debug.Log ("Stopped falling");
 			BlockController otherBlock = coll.gameObject.GetComponent<BlockController> ();
 			if (otherBlock != null){
 				if (otherBlock.Column == this.Column && otherBlock.isDamaged) {
@@ -87,9 +86,14 @@ public class BlockController : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D coll){
 		if (!IsFalling && coll.gameObject.tag == Enums.Tags.Player){
-			isTouchingPlayer = true;
-			CurrentTouchDuration = 0.0f;
+				isTouchingPlayer = true;
+				CurrentTouchDuration = 0.0f;
 		} 
+
+		if (coll.gameObject.tag == Enums.Tags.PlayerDeath) {
+			coll.gameObject.GetComponentInParent<PlayerController> ().Die ();
+
+		}
 	}
 
 	void OnTriggerExit2D(Collider2D coll){
@@ -99,6 +103,7 @@ public class BlockController : MonoBehaviour {
 	}
 
 	public void Die(){
+		GameManager.Instance.UpdateBlockTimeLimit ();
 		GridManager.Instance.RemoveBlock (this);
 	}
 }

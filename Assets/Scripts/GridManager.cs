@@ -8,7 +8,7 @@ public class GridManager : Singleton<GridManager> {
 	[SerializeField] private float BlockScale;
 	[SerializeField] private int GridSizeX;
 	[SerializeField] private int GridSizeY;
-	[SerializeField] private int SpawnHeight;
+	public int SpawnHeight;
 
 	[Range(0.0f, 1.0f)]
 	[SerializeField] private float StartFillPercentage;

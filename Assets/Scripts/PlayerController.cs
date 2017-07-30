@@ -79,4 +79,10 @@ public class PlayerController : MonoBehaviour {
 			Rigidbody.velocity = new Vector2 (Rigidbody.velocity.x, MinJumpVelocity);
 		}
 	}
+
+	public void Die(){
+		Debug.Log ("Player died");
+		Application.LoadLevel(Application.loadedLevel);
+		//this.transform.position = new Vector2 (this.transform.position.x, GridManager.Instance.SpawnHeight);
+	}
 }

@@ -7,16 +7,32 @@ public class GameManager : Singleton<GameManager> {
 	[SerializeField] private GameObject PlayerPrefab;
 	[SerializeField] private float SpawnYOffset;
 
-	public float BlockTimeLimit;
-	public float MinBlockTouchDuration;
+	[SerializeField] private float MinDamagePercentage;
+
+	[SerializeField] private float StartBlockTimeLimit;
+	[SerializeField] private float EndBlockTimeLimit;
+	[SerializeField] private int BlocksBeforeEndTimeLimit;
+
+	private int DestroyedBlocksCount = 0;
+
+	[HideInInspector] public float BlockTimeLimit;
+
 	// Use this for initialization
 	void Start () {
-		
+		Debug.Log ("Starting gamemanager");
+		BlockTimeLimit = StartBlockTimeLimit;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+	}
+
+	public void UpdateBlockTimeLimit(){
+		if (DestroyedBlocksCount < BlocksBeforeEndTimeLimit) {
+			DestroyedBlocksCount++;
+			BlockTimeLimit = StartBlockTimeLimit - (StartBlockTimeLimit - EndBlockTimeLimit) * ((float)DestroyedBlocksCount / (float)BlocksBeforeEndTimeLimit);
+			Debug.Log ("New time limit: " + BlockTimeLimit + " destroyed blocks: " + DestroyedBlocksCount);
+		}
 	}
 
 	public void OnGridGenerated(){
@@ -33,5 +49,9 @@ public class GameManager : Singleton<GameManager> {
 		player.transform.localPosition = spawnPosition;
 		Debug.LogError (player.transform.localPosition	);
 
+	}
+
+	public float GetMinBlockTouchDuration(){
+		return BlockTimeLimit * MinDamagePercentage;
 	}
 }
