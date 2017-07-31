@@ -23,6 +23,8 @@ public class GameManager : Singleton<GameManager> {
 	[HideInInspector] public float BlockTimeLimit;
 
 	void Start () {
+		GameState = Enums.GameState.MainMenu;
+
 		Debug.Log ("Starting gamemanager");
 		BlockTimeLimit = StartBlockTimeLimit;
 	}
@@ -60,16 +62,18 @@ public class GameManager : Singleton<GameManager> {
 	}
 
 	public void StartGame(){
-		//TODO
-
+		Events.OnGameStarted ();
+		GameState = Enums.GameState.Playing;
 	}
 
 	public void EndGame(){
-		UiController.Instance.EndGame ();
-		//TODO
+		Events.OnGameEnded ();
+		GameState = Enums.GameState.GameOver;
 	}
 
 	public void RestartGame(){
+		Events.OnGameRestarted ();
+		GameState = Enums.GameState.Playing;
 		//TODO
 	}
 }

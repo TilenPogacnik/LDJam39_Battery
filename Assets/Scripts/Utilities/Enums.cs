@@ -7,6 +7,7 @@
 	}
 
 	public enum GameState {
+		Tutorial,
 		Playing,
 		GameOver,
 		MainMenu

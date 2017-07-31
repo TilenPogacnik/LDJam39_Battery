@@ -6,6 +6,14 @@ public class UiController : Singleton<UiController> {
 	
 	[SerializeField] private Animator animator;
 
+	void OnEnable(){
+		Events.gameEnded += EndGame;
+	}
+
+	void OnDisable(){
+		Events.gameEnded -= EndGame;
+	}
+
 	public void StartGame(){
 		animator.SetTrigger ("StartGame");
 	}
