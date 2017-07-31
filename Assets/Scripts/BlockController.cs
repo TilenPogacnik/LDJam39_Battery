@@ -64,10 +64,6 @@ public class BlockController : MonoBehaviour {
 	}
 
 	void OnCollisionEnter2D(Collision2D coll){
-		if (coll.gameObject.tag == Enums.Tags.Player) {
-			//Debug.LogError ("Player died");
-		}
-
 		if (IsFalling && coll.gameObject.tag == Enums.Tags.Block) {
 			BlockController otherBlock = coll.gameObject.GetComponent<BlockController> ();
 			if (otherBlock != null){

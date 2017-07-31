@@ -14,19 +14,19 @@ public class GameManager : Singleton<GameManager> {
 	[SerializeField] private float EndBlockTimeLimit;
 	[SerializeField] private int BlocksBeforeEndTimeLimit;
 	[SerializeField] private Text ScoreText;
+	[SerializeField] private Animator FakeUI;
 
+	public Enums.GameState GameState;
 	private int Score = 0;
 	private int DestroyedBlocksCount = 0;
 
 	[HideInInspector] public float BlockTimeLimit;
 
-	// Use this for initialization
 	void Start () {
 		Debug.Log ("Starting gamemanager");
 		BlockTimeLimit = StartBlockTimeLimit;
 	}
 	
-	// Update is called once per frame
 	void Update () {
 	}
 
@@ -39,7 +39,6 @@ public class GameManager : Singleton<GameManager> {
 		if (DestroyedBlocksCount < BlocksBeforeEndTimeLimit) {
 			DestroyedBlocksCount++;
 			BlockTimeLimit = StartBlockTimeLimit - (StartBlockTimeLimit - EndBlockTimeLimit) * ((float)DestroyedBlocksCount / (float)BlocksBeforeEndTimeLimit);
-			Debug.Log ("New time limit: " + BlockTimeLimit + " destroyed blocks: " + DestroyedBlocksCount);
 		}
 	}
 
@@ -51,15 +50,26 @@ public class GameManager : Singleton<GameManager> {
 		Debug.Log ("Spawning plyer");
 		Vector3 spawnPosition = new  Vector3 (Random.Range(0, GridManager.Instance.GridWidth), GridManager.Instance.HighestBlockYPosition, 0f);
 		spawnPosition.y += SpawnYOffset;
-		Debug.LogError (spawnPosition);
 
 		GameObject player = Instantiate<GameObject> (PlayerPrefab, Vector3.zero, Quaternion.identity, this.transform);
 		player.transform.localPosition = spawnPosition;
-		Debug.LogError (player.transform.localPosition	);
-
 	}
 
 	public float GetMinBlockTouchDuration(){
 		return BlockTimeLimit * MinDamagePercentage;
+	}
+
+	public void StartGame(){
+		//TODO
+
+	}
+
+	public void EndGame(){
+		UiController.Instance.EndGame ();
+		//TODO
+	}
+
+	public void RestartGame(){
+		//TODO
 	}
 }

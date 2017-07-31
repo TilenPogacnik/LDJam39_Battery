@@ -80,9 +80,16 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
+	void OnTriggerEnter2D(Collider2D coll){
+		if (coll.gameObject.tag == Enums.Tags.KillZone) {
+			Die ();
+		}
+	}
 	public void Die(){
 		Debug.Log ("Player died");
-		Application.LoadLevel(Application.loadedLevel);
+		GameManager.Instance.EndGame ();
+		//TODO: actually die
+		//Application.LoadLevel(Application.loadedLevel);
 		//this.transform.position = new Vector2 (this.transform.position.x, GridManager.Instance.SpawnHeight);
 	}
 }

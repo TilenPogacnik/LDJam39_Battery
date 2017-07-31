@@ -112,8 +112,11 @@ public class GridManager : Singleton<GridManager> {
 			if (RespawnQueueBlockCount > 0) {
 				List<int> availableColumns = GetAvailableSpawnColumns ();
 				if (availableColumns.Count > 0) {
-					InstantiateBlock (SelectRandomColumn(availableColumns), SpawnHeight);
-					RespawnQueueBlockCount--;
+					int column = SelectRandomColumn (availableColumns);
+					if (column >= 0) {
+						InstantiateBlock (column, SpawnHeight);
+						RespawnQueueBlockCount--;
+					}
 				}
 			}
 			yield return null;
@@ -141,7 +144,6 @@ public class GridManager : Singleton<GridManager> {
 				return availableColumns[i];
 			}
 		}
-		Debug.LogError ("Wrong random column selected");
 		return -1;
 	}
 
@@ -166,7 +168,10 @@ public class GridManager : Singleton<GridManager> {
 	}
 
 	private bool IsSpawnPointEmpty(int column){
-		return Blocks [column] [CountBlocksInColumn (column) - 1].gameObject.transform.position.y < (SpawnHeight - 1) * BlockScale;
+		if (CountBlocksInColumn (column) > 0) {
+			return Blocks [column] [CountBlocksInColumn (column) - 1].gameObject.transform.position.y < (SpawnHeight - 1) * BlockScale;
+		}
+		return true;
 	}
 
 	public Vector2 GetNearestPointOnGrid(Vector2 startLocation){
