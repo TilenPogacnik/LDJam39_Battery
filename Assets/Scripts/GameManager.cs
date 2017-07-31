@@ -30,7 +30,7 @@ public class GameManager : Singleton<GameManager> {
 		Debug.Log ("Starting gamemanager");
 		BlockTimeLimit = StartBlockTimeLimit;
 	}
-	
+		
 	void Update () {
 	}
 

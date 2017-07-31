@@ -24,7 +24,6 @@ public class UiController : Singleton<UiController> {
 
 	public void RestartGame(){
 		animator.SetTrigger ("RestartGame");
-		GameManager.Instance.RestartGame ();
 	}
 
 	public void GameStarted(){

@@ -15,9 +15,11 @@ public class PlayerController : MonoBehaviour {
 	private bool isJumping = false;
 
 	private Rigidbody2D Rigidbody;
+	private PlayerAudio audio;
 
 	void Awake() {
 		Rigidbody = this.GetComponent<Rigidbody2D> ();
+		audio = this.GetComponent<PlayerAudio> ();
 	}
 
 	void FixedUpdate () {
@@ -69,7 +71,10 @@ public class PlayerController : MonoBehaviour {
 	private void Jump(){
 		isJumping = true;
 		PlayerAnimator.SetTrigger ("jump");
+		//PlayerAnimator.ResetTrigger ("jump");
 		PlayerAnimator.SetBool ("jumping", isJumping);
+
+		audio.PlayJumpSound ();
 
 		Rigidbody.velocity = new Vector2 (Rigidbody.velocity.x, MaxJumpVelocity);
 	}
@@ -90,9 +95,32 @@ public class PlayerController : MonoBehaviour {
 			col.enabled = false;
 		}
 
-		Events.OnPlayerDied ();
+		//Events.OnPlayerDied ();
+		StartCoroutine (DeathAnimation());
 		//TODO: actually die
 		//Application.LoadLevel(Application.loadedLevel);
 		//this.transform.position = new Vector2 (this.transform.position.x, GridManager.Instance.SpawnHeight);
+	}
+
+	private IEnumerator DeathAnimation(){
+		float timeScale = Time.timeScale;
+		Time.timeScale = 0;
+		yield return StartCoroutine(WaitForRealSeconds (0.1f));
+		Time.timeScale = timeScale;
+		audio.PlayDeathSound ();
+
+		Events.OnPlayerDied ();
+
+		yield return WaitForRealSeconds (2.0f);
+		Destroy (this.gameObject);
+	}
+
+	public static IEnumerator WaitForRealSeconds(float time)
+	{
+		float start = Time.realtimeSinceStartup;
+		while (Time.realtimeSinceStartup < start + time)
+		{
+			yield return null;
+		}
 	}
 }
