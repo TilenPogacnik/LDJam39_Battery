@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class GridManager : Singleton<GridManager> {
 
@@ -19,6 +20,9 @@ public class GridManager : Singleton<GridManager> {
 
 	public List<List<BlockController>> Blocks = new List<List<BlockController>>();
 	public List<Vector2> SpawnPositions;
+	private bool SpawnBlocks = false;
+
+	public bool GridGenerated = false;
 
 	public float GridWidth {
 		get{
@@ -34,13 +38,22 @@ public class GridManager : Singleton<GridManager> {
 
 	public float HighestBlockYPosition;
 
+	void OnEnable(){
+		Events.playerDied += KillGrid;
+		Events.gameStarted += EnableSpawnBlocks;
+	}
+
+	void OnDisable(){
+		Events.playerDied -= KillGrid;
+		Events.gameStarted += EnableSpawnBlocks;
+	}
+
 	void Awake() {
 	}
 
 	// Use this for initialization
 	void Start () {
 		GenerateGrid ();
-		GameManager.Instance.OnGridGenerated ();
 		StartCoroutine (RespawnBlocks ());
 	}
 	
@@ -49,7 +62,27 @@ public class GridManager : Singleton<GridManager> {
 		
 	}
 
-	private void GenerateGrid(){
+	private void EnableSpawnBlocks(){
+		SpawnBlocks = true;
+	}
+	private void KillGrid(){
+		SpawnBlocks = false;
+		StartCoroutine (AnimateGridKilling ());
+	}
+
+	private IEnumerator AnimateGridKilling(){
+		List<BlockController> allBlocks = Blocks.SelectMany (x => x).ToList ();
+		while (allBlocks.Count > 0) {
+			BlockController block = allBlocks [Random.Range (0, allBlocks.Count - 1)];
+			allBlocks.Remove (block);
+			RemoveBlock(block);
+			yield return new WaitForSeconds (0.01f);
+		}
+		GameManager.Instance.EndGame ();
+	}
+
+
+	public void GenerateGrid(bool animate = false){
 		int startBlockCount = Mathf.RoundToInt(MaxGridBlockCount * StartFillPercentage);
 
 		for (int y = 0; y < GridSizeY; y++){
@@ -58,11 +91,18 @@ public class GridManager : Singleton<GridManager> {
 					Blocks.Add(new List<BlockController> ());
 				}
 				InstantiateBlock (x, y, true);
+
+				if (animate){
+					//yield return null;
+				}
+
 				if (CurrentBlockCount >= startBlockCount) {
 					HighestBlockYPosition = y * BlockScale;
 					for (int i = 0; i < GridSizeX; i++) {
 						RefreshColumnDamages (i);
 					}
+					GameManager.Instance.OnGridGenerated ();
+					GridGenerated = true;
 					return;
 				}
 			}
@@ -109,7 +149,7 @@ public class GridManager : Singleton<GridManager> {
 		
 	private IEnumerator RespawnBlocks(){
 		while (true) {
-			if (RespawnQueueBlockCount > 0) {
+			if (SpawnBlocks && RespawnQueueBlockCount > 0) {
 				List<int> availableColumns = GetAvailableSpawnColumns ();
 				if (availableColumns.Count > 0) {
 					int column = SelectRandomColumn (availableColumns);

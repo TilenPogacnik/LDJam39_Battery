@@ -15,6 +15,7 @@ public class GameManager : Singleton<GameManager> {
 	[SerializeField] private int BlocksBeforeEndTimeLimit;
 	[SerializeField] private Text ScoreText;
 	[SerializeField] private Animator FakeUI;
+	[SerializeField] private Transform SpawnPosition;
 
 	public Enums.GameState GameState;
 	private int Score = 0;
@@ -45,16 +46,13 @@ public class GameManager : Singleton<GameManager> {
 	}
 
 	public void OnGridGenerated(){
-		SpawnPlayer ();
+		Debug.Log ("Grid generated");
 	}
 
 	private void SpawnPlayer(){
-		Debug.Log ("Spawning plyer");
-		Vector3 spawnPosition = new  Vector3 (Random.Range(0, GridManager.Instance.GridWidth), GridManager.Instance.HighestBlockYPosition, 0f);
-		spawnPosition.y += SpawnYOffset;
-
-		GameObject player = Instantiate<GameObject> (PlayerPrefab, Vector3.zero, Quaternion.identity, this.transform);
-		player.transform.localPosition = spawnPosition;
+		Debug.Log ("Spawning player");
+		GameObject player = Instantiate<GameObject> (PlayerPrefab, SpawnPosition.position, Quaternion.identity, this.transform);
+		//player.transform.localPosition = SpawnPosition;
 	}
 
 	public float GetMinBlockTouchDuration(){
@@ -62,6 +60,10 @@ public class GameManager : Singleton<GameManager> {
 	}
 
 	public void StartGame(){
+		if (!GridManager.Instance.GridGenerated) {
+			GridManager.Instance.GenerateGrid ();
+		}
+		SpawnPlayer ();
 		Events.OnGameStarted ();
 		GameState = Enums.GameState.Playing;
 	}

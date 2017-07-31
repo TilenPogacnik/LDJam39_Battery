@@ -86,8 +86,7 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 	public void Die(){
-		Debug.Log ("Player died");
-		GameManager.Instance.EndGame ();
+		Events.OnPlayerDied ();
 		//TODO: actually die
 		//Application.LoadLevel(Application.loadedLevel);
 		//this.transform.position = new Vector2 (this.transform.position.x, GridManager.Instance.SpawnHeight);

@@ -16,10 +16,19 @@ public class BlockController : MonoBehaviour {
 		}
 	}
 	public bool CanBeDamaged = false;
+	private bool CanDie = true;
 	private bool isTouchingPlayer = false;
 	public bool IsFalling = false;
 	private float CurrentTouchDuration = float.MaxValue;
 	private float DeathYPosition;
+
+	void OnEnable(){
+		Events.playerDied += MakeImmortal;
+	}
+
+	void OnDisable(){
+		Events.playerDied -= MakeImmortal;
+	}
 
 	void Awake () {
 		CurrentHealth = 1.0f;
@@ -36,6 +45,11 @@ public class BlockController : MonoBehaviour {
 
 		//BlockSprite.color = CanBeDamaged ? Color.red : Color.white;
 		//BlockSprite.color = IsFalling ? Color.green: BlockSprite.color;
+		//BlockSprite.color = isTouchingPlayer ? Color.green: Color.white;
+	}
+
+	private void MakeImmortal(){
+		CanDie = false;
 	}
 
 	private void DecreaseBlockHealth(){
@@ -43,7 +57,9 @@ public class BlockController : MonoBehaviour {
 		UpdateBlockColor ();
 		UpdateBlockPosition ();
 		if (CurrentHealth <= 0.0f) {
-			Die ();
+			if (CanDie) {
+				Die ();
+			}
 		}
 
 		CurrentTouchDuration += Time.fixedDeltaTime;
@@ -68,7 +84,9 @@ public class BlockController : MonoBehaviour {
 			BlockController otherBlock = coll.gameObject.GetComponent<BlockController> ();
 			if (otherBlock != null){
 				if (otherBlock.Column == this.Column && otherBlock.isDamaged) {
-					otherBlock.Die ();
+					if (CanDie) {
+						otherBlock.Die ();
+					}
 					return;
 				}
 			}
@@ -89,6 +107,12 @@ public class BlockController : MonoBehaviour {
 		if (coll.gameObject.tag == Enums.Tags.PlayerDeath) {
 			coll.gameObject.GetComponentInParent<PlayerController> ().Die ();
 
+		}
+	}
+
+	void OnTriggerStay2D(Collider2D coll){
+		if (coll.gameObject.tag == Enums.Tags.Player){
+			isTouchingPlayer = true;
 		}
 	}
 
