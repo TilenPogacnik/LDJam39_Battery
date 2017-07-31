@@ -91,9 +91,14 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 	public void Die(){
-		foreach (Collider2D col in this.gameObject.GetComponentsInChildren<Collider2D> ()) {
-			col.enabled = false;
+		//foreach (Collider2D col in this.gameObject.GetComponentsInChildren<Collider2D> ()) {
+		//	col.enabled = false;
+		//}
+		this.gameObject.layer = 14;
+		foreach (Transform ts in this.gameObject.GetComponentsInChildren<Transform>()){
+			ts.gameObject.layer = 14;
 		}
+
 
 		//Events.OnPlayerDied ();
 		StartCoroutine (DeathAnimation());
