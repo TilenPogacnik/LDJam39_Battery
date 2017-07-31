@@ -86,6 +86,10 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 	public void Die(){
+		foreach (Collider2D col in this.gameObject.GetComponentsInChildren<Collider2D> ()) {
+			col.enabled = false;
+		}
+
 		Events.OnPlayerDied ();
 		//TODO: actually die
 		//Application.LoadLevel(Application.loadedLevel);

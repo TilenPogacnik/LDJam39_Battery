@@ -53,13 +53,13 @@ public class GridManager : Singleton<GridManager> {
 
 	// Use this for initialization
 	void Start () {
-		GenerateGrid ();
+		StartCoroutine(GenerateGrid ());
 		StartCoroutine (RespawnBlocks ());
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+		//Debug.Log (CurrentBlockCount + " " + RespawnQueueBlockCount);
 	}
 
 	private void EnableSpawnBlocks(){
@@ -78,14 +78,19 @@ public class GridManager : Singleton<GridManager> {
 			RemoveBlock(block);
 			yield return new WaitForSeconds (0.01f);
 		}
+		RespawnQueueBlockCount = 0;
+		GridGenerated = false;
 		GameManager.Instance.EndGame ();
 	}
 
 
-	public void GenerateGrid(bool animate = false){
+	public IEnumerator GenerateGrid(bool animate = false){
+		Debug.Log ("Generating grid");
+		Blocks = new List<List<BlockController>>();
 		int startBlockCount = Mathf.RoundToInt(MaxGridBlockCount * StartFillPercentage);
 
 		for (int y = 0; y < GridSizeY; y++){
+			Debug.Log ("Generating grid in " + y + " column.");
 			for (int x = 0; x < GridSizeX; x++) {
 				if (Blocks.Count <= x) {
 					Blocks.Add(new List<BlockController> ());
@@ -93,7 +98,7 @@ public class GridManager : Singleton<GridManager> {
 				InstantiateBlock (x, y, true);
 
 				if (animate){
-					//yield return null;
+					yield return new WaitForSeconds (0.01f);
 				}
 
 				if (CurrentBlockCount >= startBlockCount) {
@@ -103,7 +108,7 @@ public class GridManager : Singleton<GridManager> {
 					}
 					GameManager.Instance.OnGridGenerated ();
 					GridGenerated = true;
-					return;
+					yield break;
 				}
 			}
 		}

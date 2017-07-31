@@ -14,6 +14,7 @@ public class GameManager : Singleton<GameManager> {
 	[SerializeField] private float EndBlockTimeLimit;
 	[SerializeField] private int BlocksBeforeEndTimeLimit;
 	[SerializeField] private Text ScoreText;
+	[SerializeField] private Text GameOverScoreText;
 	[SerializeField] private Animator FakeUI;
 	[SerializeField] private Transform SpawnPosition;
 
@@ -35,6 +36,12 @@ public class GameManager : Singleton<GameManager> {
 
 	public void IncreaseScore(){
 		Score++;
+		ScoreText.text = Score.ToString (); 
+		GameOverScoreText.text = Score.ToString (); 
+	}
+
+	private void ResetScore(){
+		Score = 0;
 		ScoreText.text = Score.ToString (); 
 	}
 
@@ -59,9 +66,10 @@ public class GameManager : Singleton<GameManager> {
 		return BlockTimeLimit * MinDamagePercentage;
 	}
 
-	public void StartGame(){
+	public IEnumerator StartGame(){
+		ResetScore ();
 		if (!GridManager.Instance.GridGenerated) {
-			GridManager.Instance.GenerateGrid ();
+			yield return StartCoroutine(GridManager.Instance.GenerateGrid (true));
 		}
 		SpawnPlayer ();
 		Events.OnGameStarted ();
@@ -74,8 +82,8 @@ public class GameManager : Singleton<GameManager> {
 	}
 
 	public void RestartGame(){
+		Debug.Log ("Restaring game");
 		Events.OnGameRestarted ();
-		GameState = Enums.GameState.Playing;
-		//TODO
+		StartCoroutine(StartGame ());
 	}
 }

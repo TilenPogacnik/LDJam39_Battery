@@ -24,10 +24,11 @@ public class UiController : Singleton<UiController> {
 
 	public void RestartGame(){
 		animator.SetTrigger ("RestartGame");
+		GameManager.Instance.RestartGame ();
 	}
 
 	public void GameStarted(){
-		GameManager.Instance.StartGame ();
+		StartCoroutine(GameManager.Instance.StartGame ());
 	}
 
 	public void GameRestarted(){

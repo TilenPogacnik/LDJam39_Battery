@@ -6,8 +6,7 @@ public class RestartButton : MonoBehaviour {
 
 	void OnMouseOver(){
 		if (Input.GetMouseButtonUp (0)) {
-			Debug.Log ("Restarting game");
-			//TODO restart game
+			UiController.Instance.RestartGame ();
 		}
 	}
 }
